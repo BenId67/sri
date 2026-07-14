@@ -1,20 +1,30 @@
 from django.db import models
-from backend.apps.common.models import BaseModel
-# Create your models here.
+from apps.common.models import BaseModel
+from apps.visitors.models import Visitor
+from apps.workflow.models import Workflow
+from apps.accounts.models import User
+from apps.common.choices import VisitStatus
+import django.utils.timezone
 
 class Visit(BaseModel):
-    visitor = models.ForeignKey('visitors.Visitor', on_delete=models.CASCADE)
-    workflow = models.ForeignKey('workflow.Workflow', on_delete=models.CASCADE)
-    visit_date = models.DateTimeField()
-    purpose = models.TextField()
-    host_name = models.CharField(max_length=255)
-    host_department = models.CharField(max_length=255)
-    host_email = models.EmailField()
-    host_phone = models.CharField(max_length=20)
+    reference = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    visitor = models.ForeignKey(Visitor, on_delete=models.PROTECT, related_name="visits")
+    workflow = models.ForeignKey(Workflow, on_delete=models.PROTECT, related_name="visits")
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="created_visits", default=None, null=True)
+    reason = models.CharField(max_length=255)
+    service = models.CharField(max_length=255)
+    entry_time = models.DateTimeField(default=django.utils.timezone.now)
+    exit_time = models.DateTimeField(null=True, blank=True)
+    duration = models.DurationField(null=True, blank=True)
+    document_retained = models.BooleanField(default=False)
+    badge_issued = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=VisitStatus.choices, default=VisitStatus.IN_PROGRESS)
 
     class Meta:
-        db_table = "Visit"
-        ordering = ["-visit_date"]
+        db_table = "visits"
+        ordering = ["-entry_time"]
+        verbose_name = "Visite"
+        verbose_name_plural = "Visites"
 
     def __str__(self):
-        return f"Visit by {self.visitor} on {self.visit_date}"
+        return self.reference

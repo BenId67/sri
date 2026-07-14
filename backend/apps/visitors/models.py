@@ -1,6 +1,6 @@
 from django.db import models
-from backend.apps.common.models import BaseModel
-from backend.apps.common.choices import DocumentType, Gender
+from apps.common.models import BaseModel
+from apps.common.choices import DocumentType, Gender
 
 class Visitor(BaseModel):
     first_name = models.CharField(max_length=255)
@@ -10,8 +10,8 @@ class Visitor(BaseModel):
         choices=DocumentType.choices
     )
     document_number = models.CharField(max_length=100, unique=True, null=True, blank=True)
-    expired_date = models.DateField(null =False, blank=False, required=True)
-    issue_date = models.DateField(null =False, blank=False, required=True)
+    expired_date = models.DateField(null =False, blank=False)
+    issue_date = models.DateField(null =False, blank=False)
     gender = models.CharField(
         max_length=1,
         choices=Gender.choices
@@ -21,8 +21,11 @@ class Visitor(BaseModel):
     birth_place = models.CharField(max_length=100, null=True, blank=True )
 
     class Meta:
-        db_table = "Visitor"
+        db_table = "Visitors"
         ordering = ["last_name", "first_name"]
+        verbose_name = "Visiteur"
+        verbose_name_plural = "Visiteurs"
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.document_type}: {self.document_number})"
 
