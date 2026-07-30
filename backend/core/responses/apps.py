@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ResponsesConfig(AppConfig):
-    name = 'responses'
+    name = 'core.responses'

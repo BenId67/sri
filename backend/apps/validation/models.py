@@ -1,17 +1,31 @@
 from django.db import models
-from common.models import BaseModel
+from apps.common.models import BaseModel
 
 class Checkpoint(BaseModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    type = models.CharField(max_length=50, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(
+        unique=True, default=3
+    )
+
+    is_entry = models.BooleanField(
+        default=False
+    )
+
+    is_exit = models.BooleanField(
+        default=False
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
 
     class Meta:
-        db_table = "Checkpoint"
-        ordering = ["name"]
+        db_table = "checkpoints"
+        ordering = ["order"]
+
     def __str__(self):
-        return f"{self.name} {self.type} {self.description}"
+        return self.name
     
 class Validation(BaseModel):
     checkpoint = models.ForeignKey(Checkpoint, on_delete=models.CASCADE, related_name="validations")
@@ -22,6 +36,6 @@ class Validation(BaseModel):
     validated_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = "Validation"
-        ordering = ["name"]
+        ordering = ["checkpoint", "visit", "validated_at"]
     def __str__(self):
-        return f"{self.name} {self.description}"
+        return f"{self.status} {self.comments}"
